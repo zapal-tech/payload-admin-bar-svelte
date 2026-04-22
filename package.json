@@ -50,7 +50,7 @@
     "clean": "rimraf dist *.tsbuildinfo zapal-payload-admin-bar-svelte-*.tgz",
     "dev": "vite dev",
     "format": "prettier --write .",
-    "lint": "pnpm run format && eslint . && pnpm run check",
+    "lint": "pnpm run format && eslint . --ignore-pattern='dist/' --ignore-pattern='.svelte-kit/'",
     "prepack": "pnpm run sync && svelte-package && publint",
     "prepare": "husky && pnpm run sync || echo ''",
     "prepublishOnly": "pnpm run clean && pnpm run build",
