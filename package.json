@@ -47,7 +47,7 @@
     "check": "pnpm run sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "pnpm run check --watch",
     "check-updates": "pnpx taze major -r -l",
-    "clean": "rimraf {dist,*.tsbuildinfo}",
+    "clean": "rimraf dist *.tsbuildinfo zapal-payload-admin-bar-svelte-*.tgz",
     "dev": "vite dev",
     "format": "prettier --write .",
     "lint": "pnpm run format && eslint . && pnpm run check",
