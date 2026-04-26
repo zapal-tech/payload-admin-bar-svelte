@@ -1,6 +1,6 @@
 {
   "name": "@zapal/payload-admin-bar-svelte",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Payload CMS Admin Bar for Svelte",
   "keywords": [
@@ -51,7 +51,8 @@
     "dev": "vite dev",
     "format": "prettier --write .",
     "lint": "pnpm run format && eslint . --ignore-pattern='dist/' --ignore-pattern='.svelte-kit/'",
-    "prepack": "pnpm run sync && svelte-package && publint",
+    "prepack": "pnpm run sync && svelte-package && publint && sed -i 's/utm_source=github/utm_source=npm/g' README.md",
+    "postpack": "git checkout -- README.md",
     "prepare": "husky && pnpm run sync || echo ''",
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "preview": "vite preview",
@@ -90,7 +91,7 @@
     "payload": "^3.26.0",
     "svelte": "^5.0.0"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=24"
   },

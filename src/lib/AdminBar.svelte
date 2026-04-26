@@ -34,6 +34,7 @@
     classes,
     cmsURL,
     collectionLabels,
+    collectionLabelsLocale,
     collectionSlug,
     createProps,
     devMode,
@@ -65,12 +66,16 @@
    * `undefined` falls back to the default composed string.
    */
   function resolveCollectionLabel(
-    override: string | ((options: { slug: string; label: string }) => string) | undefined,
+    override: string | ((options: { slug: string; label: string; locale?: string }) => string) | undefined,
     defaultVerb: string,
   ): string {
-    const label = collectionLabels?.singular ?? 'page'
+    const label = collectionLabels?.singular
+      ? typeof collectionLabels.singular === 'string'
+        ? collectionLabels.singular
+        : (collectionLabels.singular?.[collectionLabelsLocale ?? 'en'] ?? 'page')
+      : 'page'
     const slug = collectionSlug ?? ''
-    if (typeof override === 'function') return override({ slug, label })
+    if (typeof override === 'function') return override({ slug, label, locale: collectionLabelsLocale })
     return override ?? `${defaultVerb} ${label}`
   }
 

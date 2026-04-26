@@ -1,6 +1,6 @@
-import { page } from '@vitest/browser/context'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from 'vitest-browser-svelte'
+import { page } from 'vitest/browser'
 
 import AdminBar from './AdminBar.svelte'
 
@@ -167,6 +167,19 @@ describe('PayloadAdminBar', () => {
       await expect.element(page.getByText('Edit Post')).toBeVisible()
     })
 
+    it('renders edit link with custom multi-language label', async () => {
+      render(AdminBar, {
+        props: {
+          cmsURL: TEST_CMS_URL,
+          collectionSlug: 'posts',
+          id: 'abc',
+          collectionLabels: { singular: { en: 'Post', uk: 'Пост' } },
+          collectionLabelsLocale: 'uk',
+        },
+      })
+      await expect.element(page.getByText('Edit Пост')).toBeVisible()
+    })
+
     it('renders create link when collectionSlug is provided', async () => {
       render(AdminBar, {
         props: {
@@ -185,6 +198,18 @@ describe('PayloadAdminBar', () => {
         props: { cmsURL: TEST_CMS_URL, collectionSlug: 'posts', collectionLabels: { singular: 'Post' } },
       })
       await expect.element(page.getByText('New Post')).toBeVisible()
+    })
+
+    it('renders create link with custom multi-language label', async () => {
+      render(AdminBar, {
+        props: {
+          cmsURL: TEST_CMS_URL,
+          collectionSlug: 'posts',
+          collectionLabels: { singular: { en: 'Post', uk: 'Пост' } },
+          collectionLabelsLocale: 'uk',
+        },
+      })
+      await expect.element(page.getByText('New Пост')).toBeVisible()
     })
 
     it('does not render edit link without id', async () => {

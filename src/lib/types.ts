@@ -13,6 +13,8 @@ export type PayloadMeUser =
 /** Inline CSS string, e.g. `'color:red;font-size:14px'`. */
 export type StyleProps = string
 
+type Label = string | Record<string, string>
+
 export type PayloadAdminBarProps = {
   /** URL path to the Payload admin panel. @default '/admin' */
   adminPath?: string
@@ -48,10 +50,12 @@ export type PayloadAdminBarProps = {
   /** Singular and plural labels used in the "Edit …" and "New …" links. */
   collectionLabels?: {
     /** Plural label, e.g. `'Posts'`. Currently unused in link text but available for custom rendering. */
-    plural?: string
+    plural?: Label
     /** Singular label used in link text, e.g. `'Post'` → "Edit Post" / "New Post". */
-    singular?: string
+    singular?: Label
   }
+  /** Locale used to determine the "Edit …" and "New …" link text when `collectionLabels` contains multiple translations. */
+  collectionLabelsLocale?: string
   /** Slug of the collection the current document belongs to. Enables the "Edit …" and "New …" links. */
   collectionSlug?: string
   /** Extra HTML attributes forwarded to the "New …" create `<a>` element. */
