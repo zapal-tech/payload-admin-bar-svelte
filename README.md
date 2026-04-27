@@ -4,7 +4,7 @@ A Svelte 5 component for the Payload CMS admin bar; a full rewrite of the origin
 ([@payloadcms/admin-bar](https://www.npmjs.com/package/@payloadcms/admin-bar)) for Svelte applications.
 
 <p style="padding:0.5rem 1rem;background:rgba(0,0,0,0.08)">
-  This package is proudly built and maintained by <a href="https://zapal.tech?utm_source=github&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=banner" style="color:#ff2800">Zapal</a>.<br>
+  This package is proudly built and maintained by <a href="https://zapal.tech?utm_source=npm&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=banner" style="color:#ff2800">Zapal</a>.<br>
   We are a Ukrainian software development company committed to giving back to the open-source community.
 </p>
 
@@ -26,36 +26,40 @@ pnpm add @zapal/payload-admin-bar-svelte
 
 ## Props
 
-| Prop                       | Type                             | Default                                 | Description                                                                                                                                                                             |
-| -------------------------- | -------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------------------------------------------------------- |
-| `cmsURL`                   | `string`                         | -                                       | **Required.** Base URL of your Payload CMS instance, e.g. `'https://cms.example.com'`.                                                                                                  |
-| `adminPath`                | `string`                         | `'/admin'`                              | URL path to the Payload admin panel.                                                                                                                                                    |
-| `apiPath`                  | `string`                         | `'/api'`                                | URL path to the Payload REST API.                                                                                                                                                       |
-| `authCollectionSlug`       | `string`                         | `'users'`                               | Slug of the authentication collection.                                                                                                                                                  |
-| `collectionSlug`           | `string`                         | -                                       | Slug of the collection the current page belongs to. Enables "Edit …" and "New …" links.                                                                                                 |
-| `id`                       | `string`                         | -                                       | Document ID used to build the "Edit …" link. Requires `collectionSlug`.                                                                                                                 |
-| `elementId`                | `string`                         | `'payload-admin-bar'`                   | The `id` HTML attribute of the bar's root element.                                                                                                                                      |
-| `logo`                     | `Snippet`                        | -                                       | Custom logo snippet rendered inside the logo link. When provided, `logoText` is ignored.                                                                                                |
-| `logoText`                 | `string`                         | `'Payload CMS'`                         | Text shown in the logo link when no custom `logo` snippet is provided.                                                                                                                  |
-| `collectionLabels`         | `{ singular?: string             | Record<string, string>; plural?: string | Record<string, string> }`                                                                                                                                                               | -   | Labels for "Edit …" and "New …" links (e.g. `{ singular: 'Post' }` → "Edit Post"). |
-| `labels`                   | `object`                         | -                                       | Translations / overrides for all button and link text. See [Labels](#labels) below.                                                                                                     |
-| `getUserLabel`             | `(user) => string`               | -                                       | Returns the display string for the profile link. Defaults to `user.email`. See [Profile label](#profile-label) below.                                                                   |
-| `class`                    | `ClassValue`                     | -                                       | CSS class on the root element. Accepts strings, arrays, or objects (clsx-compatible).                                                                                                   |
-| `classes`                  | `object`                         | -                                       | Per-element class overrides: `logo`, `user`, `controls`, `edit`, `create`, `preview`, `logout`.                                                                                         |
-| `style`                    | `string`                         | -                                       | Extra inline CSS appended after default styles on the root element.                                                                                                                     |
-| `unstyled`                 | `boolean`                        | `false`                                 | When `true`, removes all default inline styles.                                                                                                                                         |
-| `preview`                  | `boolean`                        | -                                       | When `true`, shows the "Exit preview mode" button.                                                                                                                                      |
-| `devMode`                  | `boolean \| object`              | -                                       | When `true`, renders with the built-in dummy user. When an object, its fields are merged over the dummy user — enabling a custom preview user. See [devMode user](#devmode-user) below. |
-| `suppressFetchUserWarning` | `boolean`                        | -                                       | When `true`, suppresses the `console.warn` emitted when the `/me` fetch fails. Useful in environments where unauthenticated requests are expected.                                      |
-| `onAuthChange`             | `(user) => void`                 | -                                       | Callback fired when authentication state changes. Receives the user object, `null`, or `undefined`.                                                                                     |
-| `onPreviewExit`            | `() => void`                     | -                                       | Callback fired when "Exit preview mode" is clicked.                                                                                                                                     |
-| `logoProps`                | `HTMLAnchorAttributes`           | -                                       | Extra HTML attributes forwarded to the logo `<a>`.                                                                                                                                      |
-| `userProps`                | `HTMLAnchorAttributes`           | -                                       | Extra HTML attributes forwarded to the user profile `<a>`.                                                                                                                              |
-| `editProps`                | `HTMLAnchorAttributes`           | -                                       | Extra HTML attributes forwarded to the "Edit …" `<a>`.                                                                                                                                  |
-| `createProps`              | `HTMLAnchorAttributes`           | -                                       | Extra HTML attributes forwarded to the "New …" `<a>`.                                                                                                                                   |
-| `logoutProps`              | `HTMLAnchorAttributes`           | -                                       | Extra HTML attributes forwarded to the logout `<a>`.                                                                                                                                    |
-| `divProps`                 | `HTMLAttributes<HTMLDivElement>` | -                                       | Extra HTML attributes forwarded to the controls `<div>`.                                                                                                                                |
-| `previewProps`             | `HTMLButtonAttributes`           | -                                       | Extra HTML attributes forwarded to the preview `<button>`.                                                                                                                              |
+| Prop                       | Type                                                                                         | Default               | Description                                                                                                                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmsURL`                   | `string`                                                                                     | -                     | **Required.** Base URL of your Payload CMS instance, e.g. `'https://cms.example.com'`.                                                                                                  |
+| `adminPath`                | `string`                                                                                     | `'/admin'`            | URL path to the Payload admin panel.                                                                                                                                                    |
+| `apiPath`                  | `string`                                                                                     | `'/api'`              | URL path to the Payload REST API.                                                                                                                                                       |
+| `authCollectionSlug`       | `string`                                                                                     | `'users'`             | Slug of the authentication collection.                                                                                                                                                  |
+| `collectionSlug`           | `string`                                                                                     | -                     | Slug of the collection the current page belongs to. Enables "Edit …" and "New …" links.                                                                                                 |
+| `id`                       | `string \| number`                                                                           | -                     | Document ID used to build the "Edit …" link. Requires `collectionSlug`.                                                                                                                 |
+| `elementId`                | `string`                                                                                     | `'payload-admin-bar'` | The `id` HTML attribute of the bar's root element.                                                                                                                                      |
+| `logo`                     | `Snippet`                                                                                    | -                     | Custom logo snippet rendered inside the logo link. When provided, `logoText` is ignored.                                                                                                |
+| `logoText`                 | `string`                                                                                     | `'Dashboard'`         | Text shown in the logo link when no custom `logo` snippet is provided.                                                                                                                  |
+| `additionalControls`       | `Snippet`                                                                                    | -                     | Extra controls rendered inside the controls wrapper, prepended before the default "Edit …" and "New …" links.                                                                           |
+| `collectionLabels`         | `{ singular?: string \| Record<string, string>; plural?: string \| Record<string, string> }` | -                     | Labels for "Edit …" and "New …" links (e.g. `{ singular: 'Post' }` → "Edit Post").                                                                                                      |
+| `labels`                   | `object`                                                                                     | -                     | Translations / overrides for all button and link text. See [Labels](#labels) below.                                                                                                     |
+| `getUserLabel`             | `(user) => string`                                                                           | -                     | Returns the display string for the profile link. Defaults to `user.email`. See [Profile label](#profile-label) below.                                                                   |
+| `class`                    | `ClassValue`                                                                                 | -                     | CSS class on the root element. Accepts strings, arrays, or objects (clsx-compatible).                                                                                                   |
+| `classes`                  | `object`                                                                                     | -                     | Per-element class overrides: `logo`, `user`, `controls`, `edit`, `create`, `preview`, `logout`.                                                                                         |
+| `style`                    | `string`                                                                                     | -                     | Extra inline CSS appended after default styles on the root element.                                                                                                                     |
+| `unstyled`                 | `boolean`                                                                                    | `false`               | When `true`, removes all default inline styles.                                                                                                                                         |
+| `preview`                  | `boolean`                                                                                    | -                     | When `true`, shows the "Exit preview mode" button.                                                                                                                                      |
+| `showEnterPreview`         | `boolean`                                                                                    | -                     | When `true`, shows the "Enter preview mode" button that calls `onPreviewEnter`. Ignored when `preview` is `true`.                                                                       |
+| `devMode`                  | `boolean \| object`                                                                          | -                     | When `true`, renders with the built-in dummy user. When an object, its fields are merged over the dummy user — enabling a custom preview user. See [devMode user](#devmode-user) below. |
+| `suppressFetchUserWarning` | `boolean`                                                                                    | -                     | When `true`, suppresses the `console.warn` emitted when the `/me` fetch fails. Useful in environments where unauthenticated requests are expected.                                      |
+| `onAuthChange`             | `(user) => void`                                                                             | -                     | Callback fired when authentication state changes. Receives the user object, `null`, or `undefined`.                                                                                     |
+| `onPreviewExit`            | `() => void`                                                                                 | -                     | Callback fired when "Exit preview mode" is clicked.                                                                                                                                     |
+| `onPreviewEnter`           | `() => void`                                                                                 | -                     | Callback fired when "Enter preview mode" is clicked. Used together with `showEnterPreview`.                                                                                             |
+| `logoProps`                | `HTMLAnchorAttributes`                                                                       | -                     | Extra HTML attributes forwarded to the logo `<a>`.                                                                                                                                      |
+| `userProps`                | `HTMLAnchorAttributes`                                                                       | -                     | Extra HTML attributes forwarded to the user profile `<a>`.                                                                                                                              |
+| `editProps`                | `HTMLAnchorAttributes`                                                                       | -                     | Extra HTML attributes forwarded to the "Edit …" `<a>`.                                                                                                                                  |
+| `createProps`              | `HTMLAnchorAttributes`                                                                       | -                     | Extra HTML attributes forwarded to the "New …" `<a>`.                                                                                                                                   |
+| `logoutProps`              | `HTMLAnchorAttributes`                                                                       | -                     | Extra HTML attributes forwarded to the logout `<a>`.                                                                                                                                    |
+| `controlsProps`            | `HTMLAttributes<HTMLDivElement>`                                                             | -                     | Extra HTML attributes forwarded to the controls `<div>`.                                                                                                                                |
+| `previewProps`             | `HTMLButtonAttributes`                                                                       | -                     | Extra HTML attributes forwarded to the preview `<button>`.                                                                                                                              |
+| `barProps`                 | `HTMLAttributes<HTMLDivElement>`                                                             | -                     | Extra HTML attributes forwarded to the admin bar root `<div>` element.                                                                                                                  |
 
 ### Labels
 
@@ -97,13 +101,14 @@ composed string.
 />
 ```
 
-| Key           | Type                                                               | Default                              |
-| ------------- | ------------------------------------------------------------------ | ------------------------------------ |
-| `edit`        | `string \| ((options: { slug: string; label: string }) => string)` | `` ({ label }) => `Edit ${label}` `` |
-| `create`      | `string \| ((options: { slug: string; label: string }) => string)` | `` ({ label }) => `New ${label}` ``  |
-| `logout`      | `string`                                                           | `'Logout'`                           |
-| `exitPreview` | `string`                                                           | `'Exit preview mode'`                |
-| `profile`     | `string`                                                           | `'Profile'`                          |
+| Key            | Type                                                               | Default                              |
+| -------------- | ------------------------------------------------------------------ | ------------------------------------ |
+| `edit`         | `string \| ((options: { slug: string; label: string }) => string)` | `` ({ label }) => `Edit ${label}` `` |
+| `create`       | `string \| ((options: { slug: string; label: string }) => string)` | `` ({ label }) => `New ${label}` ``  |
+| `logout`       | `string`                                                           | `'Logout'`                           |
+| `enterPreview` | `string`                                                           | `'Enter preview mode'`               |
+| `exitPreview`  | `string`                                                           | `'Exit preview mode'`                |
+| `profile`      | `string`                                                           | `'Profile'`                          |
 
 ### devMode user
 
@@ -166,16 +171,22 @@ This package is a Svelte 5 rewrite of the original React component. Key differen
 | All `style` props                                                   | `CSSProperties` (object)                     | `string` (CSS string, e.g. `'color:red'`)                                          |
 | All class props                                                     | `string`                                     | `ClassValue` (from `svelte/elements` — supports strings, arrays, objects via clsx) |
 | `logoProps`, `userProps`, `editProps`, `createProps`, `logoutProps` | custom `AnchorExtraProps`                    | `HTMLAnchorAttributes` (from `svelte/elements`)                                    |
-| `divProps`                                                          | `{ [key: string]: unknown; style?: string }` | `HTMLAttributes<HTMLDivElement>` (from `svelte/elements`)                          |
+| `controlsProps`                                                     | `{ [key: string]: unknown; style?: string }` | `HTMLAttributes<HTMLDivElement>` (from `svelte/elements`)                          |
 | `previewProps`                                                      | `{ [key: string]: unknown; style?: string }` | `HTMLButtonAttributes` (from `svelte/elements`)                                    |
+| `id` (document)                                                     | `string`                                     | `string \| number`                                                                 |
 | `PayloadMeUser.id`                                                  | `string`                                     | `number \| string` (depends on database adapter)                                   |
 
 ### New props
 
 - **`elementId`** — overrides the `id` attribute of the bar element (default: `'payload-admin-bar'`).
-- **`logoText`** — sets the default logo text (default: `'Payload CMS'`). Ignored when a custom `logo` snippet is provided.
-- **`labels`** — translation / override object for all button and link text (`edit`, `create`, `logout`, `exitPreview`,
-  `profile`). The `edit` and `create` values accept a function with signature `({ slug, label }) => string`.
+- **`logoText`** — sets the default logo text (default: `'Dashboard'`). Ignored when a custom `logo` snippet is provided.
+- **`additionalControls`** — Svelte snippet rendered inside the controls wrapper, before the default "Edit …" and "New …" links.
+- **`showEnterPreview`** — shows an "Enter preview mode" button. Ignored when `preview` is `true`.
+- **`onPreviewEnter`** — callback fired when the "Enter preview mode" button is clicked. Used together with `showEnterPreview`.
+- **`barProps`** — forwards arbitrary HTML attributes to the admin bar root `<div>` (mirrors `controlsProps` for the controls
+  wrapper).
+- **`labels`** — translation / override object for all button and link text (`edit`, `create`, `logout`, `enterPreview`,
+  `exitPreview`, `profile`). The `edit` and `create` values accept a function with signature `({ slug, label }) => string`.
 - **`getUserLabel`** — function to derive a display string from the authenticated user object, enabling display of any user field
   (e.g. `username`) instead of `email`.
 - **`devMode` (extended)** — now accepts an object in addition to `boolean`. When an object is passed, its fields are merged over
@@ -204,8 +215,8 @@ open-source the tools we build and use daily to ship high-quality software.
 If this package helped you save time, imagine what our dedicated team could do for your product. Whether you need help with
 complex custom integrations, building an app from scratch, or expanding your engineering capacity, we are open for business.
 
-- **[Explore our work](https://zapal.tech/projects?utm_source=github&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=about-zapal)**
-- **[Hire us for your next project](https://zapal.tech/contacts?utm_source=github&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=about-zapal)**
+- **[Explore our work](https://zapal.tech/projects?utm_source=npm&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=about-zapal)**
+- **[Hire us for your next project](https://zapal.tech/contacts?utm_source=npm&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=about-zapal)**
 
 ## Stand with Ukraine 🇺🇦
 
@@ -233,4 +244,4 @@ helps balance the scales and save lives:
   reconnaissance UAVs directly to front-line units.
 - **[United24](https://u24.gov.ua/)** - The official fundraising platform of Ukraine, allowing you to donate directly to Defense,
   Medical Aid, or Rebuilding efforts.
-- **[Learn more about how you can help](https://zapal.tech/support-ukraine?utm_source=github&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=stand-with-ukraine)**
+- **[Learn more about how you can help](https://zapal.tech/support-ukraine?utm_source=npm&utm_medium=referral&utm_campaign=payload-admin-bar-svelte&utm_content=stand-with-ukraine)**
