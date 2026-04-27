@@ -58,6 +58,8 @@ export type PayloadAdminBarProps = {
   collectionLabelsLocale?: string
   /** Slug of the collection the current document belongs to. Enables the "Edit …" and "New …" links. */
   collectionSlug?: string
+  /** Extra HTML attributes forwarded to the admin bar root `<div>` element. */
+  barProps?: HTMLAttributes<HTMLDivElement>
   /** Extra HTML attributes forwarded to the "New …" create `<a>` element. */
   createProps?: HTMLAnchorAttributes
   /**
@@ -69,8 +71,10 @@ export type PayloadAdminBarProps = {
    * @example `devMode={{ email: 'dev@example.com', id: '42', firstName: 'Dev' }}` — custom preview user
    */
   devMode?: boolean | { email?: string; id?: number | string; [key: string]: unknown }
+  /** Additional controls to render inside the controls wrapper, prepend before the default "Edit …" and "New …" links. Accepts a single Svelte snippet. */
+  additionalControls?: Snippet
   /** Extra HTML attributes forwarded to the controls `<div>` element. */
-  divProps?: HTMLAttributes<HTMLDivElement>
+  controlsProps?: HTMLAttributes<HTMLDivElement>
   /**
    * When `true`, suppresses the `console.warn` emitted when the `/me` fetch fails.
    * Useful in environments where unauthenticated requests are expected (e.g. static previews).
@@ -91,7 +95,7 @@ export type PayloadAdminBarProps = {
    */
   getUserLabel?: (user: NonNullable<PayloadMeUser>) => string
   /** The document `id`. Used to build the "Edit …" link URL. Requires `collectionSlug` to take effect. */
-  id?: string
+  id?: string | number
   /**
    * Translations / overrides for button and link text.
    *
@@ -117,6 +121,11 @@ export type PayloadAdminBarProps = {
      */
     logout?: string
     /**
+     * Override for the "Enter preview mode" button text.
+     * @default 'Enter preview mode'
+     */
+    enterPreview?: string
+    /**
      * Override for the "Exit preview mode" button text.
      * @default 'Exit preview mode'
      */
@@ -131,7 +140,7 @@ export type PayloadAdminBarProps = {
   logo?: Snippet
   /**
    * Text shown inside the logo link when no custom `logo` snippet is provided.
-   * @default 'Payload CMS'
+   * @default 'Dashboard'
    */
   logoText?: string
   /** Extra HTML attributes forwarded to the logo `<a>` element. */
@@ -142,8 +151,24 @@ export type PayloadAdminBarProps = {
   onAuthChange?: (user: PayloadMeUser) => void
   /** Callback fired when the "Exit preview mode" button is clicked. */
   onPreviewExit?: () => void
-  /** When `true`, shows the "Exit preview mode" button. */
+  /**
+   * Callback fired when the "Enter preview mode" button is clicked.
+   *
+   * Be careful: usually entering preview mode involves providing some form of secret token;
+   * it's important to ensure this token is handled securely and not exposed in client-side code.
+   * This callback allows you to implement a custom preview mode entry flow that suits your security requirements.
+   *
+   * @example
+   *
+   * ```svelte
+   * onPreviewEnter={() => goto('/api/preview?path=/blog/post-1')}
+   * ```
+   * */
+  onPreviewEnter?: () => void
+  /** When `true`, shows the "Exit preview mode" button */
   preview?: boolean
+  /** When `true`, shows an "Enter preview mode" button that calls `onPreviewEnter` when clicked. Ignored if `preview` is `true`. */
+  showEnterPreview?: boolean
   /** Extra HTML attributes forwarded to the "Exit preview mode" `<button>` element. */
   previewProps?: HTMLButtonAttributes
   /** Inline CSS string appended after default styles on the root element, e.g. `'margin-top:48px'`. */

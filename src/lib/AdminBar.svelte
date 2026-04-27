@@ -26,6 +26,7 @@
 
   const {
     id: docID,
+    barProps,
     elementId = 'payload-admin-bar',
     adminPath = '/admin',
     apiPath = '/api',
@@ -38,19 +39,22 @@
     collectionSlug,
     createProps,
     devMode,
-    divProps,
+    additionalControls,
+    controlsProps,
     editProps,
     suppressFetchUserWarning,
     getUserLabel,
     labels,
     logo,
     logoProps,
-    logoText = 'Payload CMS',
+    logoText = 'Dashboard',
     logoutProps,
     onAuthChange,
-    onPreviewExit,
     preview,
     previewProps,
+    showEnterPreview,
+    onPreviewEnter,
+    onPreviewExit,
     style,
     unstyled,
     userProps,
@@ -59,6 +63,8 @@
   let user = $state<PayloadMeUser>(undefined)
 
   const styled = $derived(!unstyled)
+  const adminPathWithNoTrailingSlash = $derived(adminPath.endsWith('/') ? adminPath.slice(0, -1) : adminPath)
+  const apiPathWithNoTrailingSlash = $derived(apiPath.endsWith('/') ? apiPath.slice(0, -1) : apiPath)
 
   /**
    * Resolves a label for the edit or create links.
@@ -92,7 +98,7 @@
 
       return new URL(relativePath, base).href
     } catch {
-      return `${cmsURL}${path}`
+      return `${cmsURL.endsWith('/') ? cmsURL.slice(0, -1) : cmsURL}${path.startsWith('/') ? path : `/${path}`}`
     }
   }
 
@@ -122,10 +128,10 @@
       }
 
       try {
-        const meURL = buildURL(`${apiPath}/${authCollectionSlug}/me`)
+        const meURL = buildURL(`${apiPathWithNoTrailingSlash}/${authCollectionSlug}/me`)
         const meResponse = await fetch(meURL, {
+          method: 'GET',
           credentials: 'include',
-          method: 'get',
         })
         const { user: fetchedUser } = (await meResponse.json()) as { user?: PayloadMeUser }
 
@@ -146,8 +152,8 @@
 
 {#if user}
   {@const { id: userID, email } = user}
-  <div class={className} id={elementId} style={getStyle(styles.bar, style)}>
-    <a class={classes?.logo} href={buildURL(adminPath)} style={getStyle(styles.logo, logoProps?.style)}>
+  <div {...barProps} class={className} id={elementId} style={getStyle(styles.bar, style)}>
+    <a {...logoProps} class={classes?.logo} href={buildURL(adminPath)} style={getStyle(styles.logo, logoProps?.style)}>
       {#if logo}
         {@render logo()}
       {:else}
@@ -155,21 +161,27 @@
       {/if}
     </a>
     <a
-      class={classes?.user}
-      href={buildURL(`${adminPath}/collections/${authCollectionSlug}/${userID}`)}
       rel="noopener noreferrer"
       target="_blank"
+      {...userProps}
+      href={buildURL(`${adminPathWithNoTrailingSlash}/collections/${authCollectionSlug}/${userID}`)}
+      class={classes?.user}
       style={getStyle(styles.user, userProps?.style)}
     >
       <span style={getStyle(styles.span)}>{getUserLabel ? getUserLabel(user) : email || labels?.profile || 'Profile'}</span>
     </a>
-    <div class={classes?.controls} style={getStyle(styles.controls, divProps?.style)}>
+    <div {...controlsProps} class={classes?.controls} style={getStyle(styles.controls, controlsProps?.style)}>
+      {#if additionalControls}
+        {@render additionalControls()}
+      {/if}
+
       {#if collectionSlug && docID}
         <a
-          class={classes?.edit}
-          href={buildURL(`${adminPath}/collections/${collectionSlug}/${docID}`)}
           rel="noopener noreferrer"
           target="_blank"
+          {...editProps}
+          href={buildURL(`${adminPathWithNoTrailingSlash}/collections/${collectionSlug}/${docID}`)}
+          class={classes?.edit}
           style={getStyle(styles.link, editProps?.style)}
         >
           <span style={getStyle(styles.span)}>{resolveCollectionLabel(labels?.edit, 'Edit')}</span>
@@ -177,10 +189,11 @@
       {/if}
       {#if collectionSlug}
         <a
-          class={classes?.create}
-          href={buildURL(`${adminPath}/collections/${collectionSlug}/create`)}
           rel="noopener noreferrer"
           target="_blank"
+          {...createProps}
+          class={classes?.create}
+          href={buildURL(`${adminPathWithNoTrailingSlash}/collections/${collectionSlug}/create`)}
           style={getStyle(styles.link, createProps?.style)}
         >
           <span style={getStyle(styles.span)}>{resolveCollectionLabel(labels?.create, 'New')}</span>
@@ -188,6 +201,7 @@
       {/if}
       {#if preview}
         <button
+          {...previewProps}
           class={classes?.preview}
           onclick={onPreviewExit}
           type="button"
@@ -195,16 +209,27 @@
         >
           {labels?.exitPreview ?? 'Exit preview mode'}
         </button>
+      {:else if showEnterPreview}
+        <button
+          {...previewProps}
+          class={classes?.preview}
+          onclick={onPreviewEnter}
+          type="button"
+          style={getStyle(styles.preview, previewProps?.style)}
+        >
+          {labels?.enterPreview ?? 'Enter preview mode'}
+        </button>
       {/if}
+      <a
+        rel="noopener noreferrer"
+        target="_blank"
+        {...logoutProps}
+        class={classes?.logout}
+        href={buildURL(`${adminPathWithNoTrailingSlash}/logout`)}
+        style={getStyle(styles.link, logoutProps?.style)}
+      >
+        <span style={getStyle(styles.span)}>{labels?.logout ?? 'Logout'}</span>
+      </a>
     </div>
-    <a
-      class={classes?.logout}
-      href={buildURL(`${adminPath}/logout`)}
-      rel="noopener noreferrer"
-      target="_blank"
-      style={getStyle(styles.link, logoutProps?.style)}
-    >
-      <span style={getStyle(styles.span)}>{labels?.logout ?? 'Logout'}</span>
-    </a>
   </div>
 {/if}
