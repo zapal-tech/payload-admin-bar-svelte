@@ -1,3 +1,4 @@
+import { createRawSnippet } from 'svelte'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from 'vitest-browser-svelte'
 import { page } from 'vitest/browser'
@@ -37,13 +38,13 @@ describe('PayloadAdminBar', () => {
     it('renders bar in devMode even without a logged-in user', async () => {
       mockFetchSuccess(null)
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL, devMode: true } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
     })
 
     it('renders bar in devMode when fetch fails', async () => {
       vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')))
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL, devMode: true } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
     })
 
     it('renders nothing when cmsURL is not provided and devMode is off', async () => {
@@ -117,7 +118,7 @@ describe('PayloadAdminBar', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {})
       vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')))
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL, devMode: true, suppressFetchUserWarning: true } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
     })
   })
 
@@ -128,7 +129,7 @@ describe('PayloadAdminBar', () => {
 
     it('renders the admin bar with default logo text', async () => {
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
     })
 
     it('renders the user email', async () => {
@@ -153,6 +154,20 @@ describe('PayloadAdminBar', () => {
       await expect
         .element(page.getByRole('link', { name: 'Edit page' }))
         .toHaveAttribute('href', `${TEST_CMS_URL}/admin/collections/posts/abc`)
+    })
+
+    it('renders edit link with numeric id', async () => {
+      render(AdminBar, {
+        props: {
+          cmsURL: TEST_CMS_URL,
+          adminPath: '/admin',
+          collectionSlug: 'posts',
+          id: 42,
+        },
+      })
+      await expect
+        .element(page.getByRole('link', { name: 'Edit page' }))
+        .toHaveAttribute('href', `${TEST_CMS_URL}/admin/collections/posts/42`)
     })
 
     it('renders edit link with custom label', async () => {
@@ -214,13 +229,13 @@ describe('PayloadAdminBar', () => {
 
     it('does not render edit link without id', async () => {
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL, collectionSlug: 'posts' } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
       await expect.element(page.getByText('Edit page')).not.toBeInTheDocument()
     })
 
     it('does not render edit/create links without collectionSlug', async () => {
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
       await expect.element(page.getByText('Edit page')).not.toBeInTheDocument()
       await expect.element(page.getByText('New page')).not.toBeInTheDocument()
     })
@@ -232,7 +247,7 @@ describe('PayloadAdminBar', () => {
 
     it('does not render exit preview button when preview is false', async () => {
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL, preview: false } })
-      await expect.element(page.getByText('Payload CMS')).toBeVisible()
+      await expect.element(page.getByText('Dashboard')).toBeVisible()
       await expect.element(page.getByText('Exit preview mode')).not.toBeInTheDocument()
     })
 
@@ -261,10 +276,10 @@ describe('PayloadAdminBar', () => {
       await expect.element(page.locator('#payload-admin-bar')).not.toBeInTheDocument()
     })
 
-    it('renders a custom logoText instead of Payload CMS', async () => {
+    it('renders a custom logoText instead of the default', async () => {
       render(AdminBar, { props: { cmsURL: TEST_CMS_URL, logoText: 'My CMS' } })
       await expect.element(page.getByText('My CMS')).toBeVisible()
-      await expect.element(page.getByText('Payload CMS')).not.toBeInTheDocument()
+      await expect.element(page.getByText('Dashboard')).not.toBeInTheDocument()
     })
 
     it('uses getUserLabel for the profile link text', async () => {
@@ -318,9 +333,38 @@ describe('PayloadAdminBar', () => {
       await expect.element(page.getByText('Вийти з перегляду')).toBeVisible()
     })
 
+    it('renders enter preview button when showEnterPreview is true', async () => {
+      render(AdminBar, { props: { cmsURL: TEST_CMS_URL, showEnterPreview: true } })
+      await expect.element(page.getByText('Enter preview mode')).toBeVisible()
+    })
+
+    it('does not render enter preview button when preview is also true', async () => {
+      render(AdminBar, { props: { cmsURL: TEST_CMS_URL, preview: true, showEnterPreview: true } })
+      await expect.element(page.getByText('Exit preview mode')).toBeVisible()
+      await expect.element(page.getByText('Enter preview mode')).not.toBeInTheDocument()
+    })
+
+    it('calls onPreviewEnter when enter preview button is clicked', async () => {
+      const onPreviewEnter = vi.fn()
+      render(AdminBar, { props: { cmsURL: TEST_CMS_URL, showEnterPreview: true, onPreviewEnter } })
+      await page.getByText('Enter preview mode').click()
+      expect(onPreviewEnter).toHaveBeenCalledOnce()
+    })
+
+    it('uses custom enterPreview label', async () => {
+      render(AdminBar, {
+        props: {
+          cmsURL: TEST_CMS_URL,
+          showEnterPreview: true,
+          labels: { enterPreview: 'Активувати перегляд' },
+        },
+      })
+      await expect.element(page.getByText('Активувати перегляд')).toBeVisible()
+    })
+
     it('uses custom cmsURL and adminPath for links', async () => {
       render(AdminBar, { props: { cmsURL: 'https://cms.example.com', adminPath: '/cms' } })
-      await expect.element(page.getByRole('link', { name: 'Payload CMS' })).toHaveAttribute('href', 'https://cms.example.com/cms')
+      await expect.element(page.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', 'https://cms.example.com/cms')
     })
 
     it('uses custom authCollectionSlug in user link', async () => {
@@ -343,8 +387,21 @@ describe('PayloadAdminBar', () => {
       await expect.element(page.getByText(mockUser.email)).toBeVisible()
       expect(fetch).toHaveBeenCalledWith(`${TEST_CMS_URL}/api/users/me`, {
         credentials: 'include',
-        method: 'get',
+        method: 'GET',
       })
+    })
+
+    it('forwards barProps attributes to the root element', async () => {
+      render(AdminBar, { props: { cmsURL: TEST_CMS_URL, barProps: { 'data-testid': 'my-bar' } } })
+      await expect.element(page.locator('[data-testid="my-bar"]')).toBeInTheDocument()
+    })
+
+    it('renders additionalControls snippet inside the controls wrapper', async () => {
+      const additionalControls = createRawSnippet(() => ({
+        render: () => '<button>Custom Action</button>',
+      }))
+      render(AdminBar, { props: { cmsURL: TEST_CMS_URL, additionalControls } })
+      await expect.element(page.getByText('Custom Action')).toBeVisible()
     })
   })
 })
